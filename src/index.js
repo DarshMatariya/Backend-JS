@@ -18,7 +18,7 @@ connectDB()
 /*
 ( async () => {
     try {
-        await mongoose.connect(`${process.env.MONOGDB_URL}/${DB_NAME}`)
+        await mongoose.connect(`${process.env.MONGODB_URL}/${DB_NAME}`)
         app.on("error", (error) => {
             console.log("ERROR: ", error);
             throw error;
