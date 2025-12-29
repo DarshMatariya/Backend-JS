@@ -19,7 +19,7 @@ const registerUser = asyncHandler( async (req, res) => {
     // return res
 
     
-    
+
     // 1. get user details from frontend
     const {fullName, username, email, password, } = req.body
     // console.log("email: ", email);
@@ -30,13 +30,13 @@ const registerUser = asyncHandler( async (req, res) => {
 
     // 2.validation - not empty
     // For all fiels combined - validation
-    if([fullName, username, email, password].some( (field) => field?.trim === "" )){
+    if([fullName, username, email, password].some( (field) => field?.trim() === "" )){
         throw new ApiError(400, "All field are required !")
     }
 
     // 3. check if user already exists: username, email
     // if user exists
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or: [{username}, {email}]
     })
 
@@ -45,8 +45,13 @@ const registerUser = asyncHandler( async (req, res) => {
     }
 
     // 4. check for images, check for avatar
-    const avatarLocalPath = req.files?.avatar[0].path;
-    const coverImageLocalPath = req.files?.coverImage[0].path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+
+    // console.log("AVATAR PATH:", avatarLocalPath);
+
+    // console.log("BODY:", req.body);
+    // console.log("FILES:", req.files);
 
     if(!avatarLocalPath){
         throw new ApiError(400, "Avatar Image is required !")
@@ -56,6 +61,8 @@ const registerUser = asyncHandler( async (req, res) => {
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
+    // console.log('Avatar: ', avatar);
+    
     if (!avatar) {
         throw new ApiError(400, "Avatar Image is required !")
     }
@@ -71,7 +78,7 @@ const registerUser = asyncHandler( async (req, res) => {
     })
 
     // 7. remove password and refresh token field from response
-    const createdUser = User.findById(user._id).select(
+    const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
 
@@ -86,5 +93,7 @@ const registerUser = asyncHandler( async (req, res) => {
     )
 
 })
+
+
 
 export {registerUser}

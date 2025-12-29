@@ -1,11 +1,20 @@
-// require('dotenv').config({path: './.env'})
-import connectDB from "./db/index.js";
-import dotenv from "dotenv";
-import { app } from "./app.js";
+import dotenv from 'dotenv';
+dotenv.config();
 
-dotenv.config({
-    path: './.env'
-})
+import { v2 as cloudinary } from 'cloudinary';
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
+});
+
+cloudinary.api.ping()
+  .then(() => console.log("Cloudinary connected"))
+  .catch(err => console.error("Cloudinary auth failed:", err.message));
+
+import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
 connectDB()
 .then(() => {
